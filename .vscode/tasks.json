@@ -1,0 +1,71 @@
+{
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "cmd.exe",
+        "args": ["/d", "/c"]
+      }
+    }
+  },
+  "tasks": [
+    {
+      "label": "Kill MyApp",
+      "type": "shell",
+      "linux": {
+        "command": "killall",
+        "args": ["MyApp", "||", "exit", "0"]
+      },
+      "windows": {
+        "command": "cmd",
+        "args": ["/C", "taskkill /F /IM MyApp.exe || exit 0"]
+      },
+      "presentation": {
+        "reveal": "never",
+        "close": true
+      }
+    },
+    {
+      "label": "Create Build Dir",
+      "type": "shell",
+      "linux": {
+        "command": "mkdir -p ./build/"
+      },
+      "windows": {
+        "command": "cmd",
+        "args": ["/C", "if not exist .\\build mkdir .\\build"]
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "never",
+        "close": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "CMake Configuration",
+      "dependsOn": ["Kill MyApp", "Create Build Dir"],
+      "command": "cmake",
+      "args": ["-S", "${workspaceFolder}", "-B", "${workspaceFolder}/build"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      }
+    },
+    {
+      "type": "shell",
+      "label": "CMake Build",
+      "dependsOn": ["CMake Configuration"],
+      "command": "cmake",
+      "args": ["--build", "${workspaceFolder}/build", "-j8"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ],
+  "version": "2.0.0"
+}
